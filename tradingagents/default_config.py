@@ -13,6 +13,9 @@ DEFAULT_CONFIG = {
     "deep_think_llm": os.getenv("DEEP_THINK_LLM", "o4-mini"),
     "quick_think_llm": os.getenv("QUICK_THINK_LLM", "gpt-4o-mini"),
     "backend_url": os.getenv("BACKEND_URL", "https://api.openai.com/v1"),
+    "embedding_model": os.getenv("EMBEDDING_MODEL", "text-embedding-3-small"),
+    "embedding_endpoint": os.getenv("EMBEDDING_ENDPOINT", "https://api.openai.com/v1"),
+    "embedding_api_key": os.getenv("EMBEDDING_API_KEY"),
     # Debate and discussion settings
     "max_debate_rounds": 1,
     "max_risk_discuss_rounds": 1,
