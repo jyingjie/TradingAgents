@@ -1,6 +1,7 @@
 from typing import Optional
 import datetime
 import typer
+import os
 from pathlib import Path
 from functools import wraps
 from rich.console import Console
@@ -467,22 +468,29 @@ def get_user_selections():
     )
     selected_research_depth = select_research_depth()
 
-    # Step 5: OpenAI backend
-    console.print(
-        create_question_box(
-            "Step 5: OpenAI backend", "Select which service to talk to"
+    # Step 5: OpenAI backend & Step 6: Thinking agents
+    if os.getenv("DEEP_THINK_LLM") and os.getenv("QUICK_THINK_LLM") and os.getenv("BACKEND_URL"):
+        selected_llm_provider = os.getenv("LLM_PROVIDER", "openai")
+        backend_url = os.getenv("BACKEND_URL")
+        selected_shallow_thinker = os.getenv("QUICK_THINK_LLM")
+        selected_deep_thinker = os.getenv("DEEP_THINK_LLM")
+    else:
+        # Step 5: OpenAI backend
+        console.print(
+            create_question_box(
+                "Step 5: OpenAI backend", "Select which service to talk to"
+            )
         )
-    )
-    selected_llm_provider, backend_url = select_llm_provider()
-    
-    # Step 6: Thinking agents
-    console.print(
-        create_question_box(
-            "Step 6: Thinking Agents", "Select your thinking agents for analysis"
+        selected_llm_provider, backend_url = select_llm_provider()
+        
+        # Step 6: Thinking agents
+        console.print(
+            create_question_box(
+                "Step 6: Thinking Agents", "Select your thinking agents for analysis"
+            )
         )
-    )
-    selected_shallow_thinker = select_shallow_thinking_agent(selected_llm_provider)
-    selected_deep_thinker = select_deep_thinking_agent(selected_llm_provider)
+        selected_shallow_thinker = select_shallow_thinking_agent(selected_llm_provider)
+        selected_deep_thinker = select_deep_thinking_agent(selected_llm_provider)
 
     return {
         "ticker": selected_ticker,
