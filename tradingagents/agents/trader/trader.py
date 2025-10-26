@@ -3,7 +3,7 @@ import time
 import json
 
 
-def create_trader(llm, memory):
+def create_trader(llm, memory, config=None):
     def trader_node(state, name):
         company_name = state["company_of_interest"]
         investment_plan = state["investment_plan"]
@@ -21,6 +21,16 @@ def create_trader(llm, memory):
                 past_memory_str += rec["recommendation"] + "\n\n"
         else:
             past_memory_str = "No past memories found."
+        
+        # Get report language configuration
+        report_language = config.get("report_language", "english") if config else "english"
+        
+        # Add language instruction
+        language_instruction = ""
+        if report_language == "chinese":
+            language_instruction = " Write your trading plan and recommendation in Chinese (中文). Keep technical terms accurate."
+        else:
+            language_instruction = " Write your trading plan and recommendation in English."
 
         context = {
             "role": "user",
@@ -30,7 +40,7 @@ def create_trader(llm, memory):
         messages = [
             {
                 "role": "system",
-                "content": f"""You are a trading agent analyzing market data to make investment decisions. Based on your analysis, provide a specific recommendation to buy, sell, or hold. End with a firm decision and always conclude your response with 'FINAL TRANSACTION PROPOSAL: **BUY/HOLD/SELL**' to confirm your recommendation. Do not forget to utilize lessons from past decisions to learn from your mistakes. Here is some reflections from similar situatiosn you traded in and the lessons learned: {past_memory_str}""",
+                "content": f"""You are a trading agent analyzing market data to make investment decisions. Based on your analysis, provide a specific recommendation to buy, sell, or hold. End with a firm decision and always conclude your response with 'FINAL TRANSACTION PROPOSAL: **BUY/HOLD/SELL**' to confirm your recommendation. Do not forget to utilize lessons from past decisions to learn from your mistakes. Here is some reflections from similar situatiosn you traded in and the lessons learned: {past_memory_str}{language_instruction}""",
             },
             context,
         ]

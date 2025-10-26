@@ -8,3 +8,8 @@ class AnalystType(str, Enum):
     SOCIAL = "social"
     NEWS = "news"
     FUNDAMENTALS = "fundamentals"
+
+
+class ReportLanguage(str, Enum):
+    ENGLISH = "english"
+    CHINESE = "chinese"

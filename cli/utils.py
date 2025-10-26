@@ -1,7 +1,7 @@
 import questionary
 from typing import List, Optional, Tuple, Dict
 
-from cli.models import AnalystType
+from cli.models import AnalystType, ReportLanguage
 
 ANALYST_ORDER = [
     ("Market Analyst", AnalystType.MARKET),
@@ -274,3 +274,33 @@ def select_llm_provider() -> tuple[str, str]:
     print(f"You selected: {display_name}\tURL: {url}")
     
     return display_name, url
+
+
+def select_report_language() -> ReportLanguage:
+    """Select the language for final reports."""
+    LANGUAGE_OPTIONS = [
+        ("English - Generate reports in English", ReportLanguage.ENGLISH),
+        ("中文 - 生成中文报告", ReportLanguage.CHINESE),
+    ]
+    
+    choice = questionary.select(
+        "Select Your [Report Language]:",
+        choices=[
+            questionary.Choice(display, value=value)
+            for display, value in LANGUAGE_OPTIONS
+        ],
+        instruction="\n- Use arrow keys to navigate\n- Press Enter to select",
+        style=questionary.Style(
+            [
+                ("selected", "fg:cyan noinherit"),
+                ("highlighted", "fg:cyan noinherit"),
+                ("pointer", "fg:cyan noinherit"),
+            ]
+        ),
+    ).ask()
+    
+    if choice is None:
+        console.print("\n[red]No report language selected. Exiting...[/red]")
+        exit(1)
+    
+    return choice

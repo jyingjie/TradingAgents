@@ -2,7 +2,7 @@ import time
 import json
 
 
-def create_research_manager(llm, memory):
+def create_research_manager(llm, memory, config=None):
     def research_manager_node(state) -> dict:
         history = state["investment_debate_state"].get("history", "")
         market_research_report = state["market_report"]
@@ -18,6 +18,16 @@ def create_research_manager(llm, memory):
         past_memory_str = ""
         for i, rec in enumerate(past_memories, 1):
             past_memory_str += rec["recommendation"] + "\n\n"
+        
+        # Get report language configuration
+        report_language = config.get("report_language", "english") if config else "english"
+        
+        # Add language instruction
+        language_instruction = ""
+        if report_language == "chinese":
+            language_instruction = "\n\nIMPORTANT: Write your decision and investment plan in Chinese (中文). Keep technical terms accurate."
+        else:
+            language_instruction = "\n\nIMPORTANT: Write your decision and investment plan in English."
 
         prompt = f"""As the portfolio manager and debate facilitator, your role is to critically evaluate this round of debate and make a definitive decision: align with the bear analyst, the bull analyst, or choose Hold only if it is strongly justified based on the arguments presented.
 
@@ -35,7 +45,8 @@ Here are your past reflections on mistakes:
 
 Here is the debate:
 Debate History:
-{history}"""
+{history}
+{language_instruction}"""
         response = llm.invoke(prompt)
 
         new_investment_debate_state = {

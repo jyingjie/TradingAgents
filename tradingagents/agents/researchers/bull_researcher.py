@@ -3,7 +3,7 @@ import time
 import json
 
 
-def create_bull_researcher(llm, memory):
+def create_bull_researcher(llm, memory, config=None):
     def bull_node(state) -> dict:
         investment_debate_state = state["investment_debate_state"]
         history = investment_debate_state.get("history", "")
@@ -21,6 +21,16 @@ def create_bull_researcher(llm, memory):
         past_memory_str = ""
         for i, rec in enumerate(past_memories, 1):
             past_memory_str += rec["recommendation"] + "\n\n"
+        
+        # Get report language configuration
+        report_language = config.get("report_language", "english") if config else "english"
+        
+        # Add language instruction
+        language_instruction = ""
+        if report_language == "chinese":
+            language_instruction = "\n\nIMPORTANT: Write your analysis and argument in Chinese (中文). Keep technical terms accurate."
+        else:
+            language_instruction = "\n\nIMPORTANT: Write your analysis and argument in English."
 
         prompt = f"""You are a Bull Analyst advocating for investing in the stock. Your task is to build a strong, evidence-based case emphasizing growth potential, competitive advantages, and positive market indicators. Leverage the provided research and data to address concerns and counter bearish arguments effectively.
 
@@ -40,6 +50,7 @@ Conversation history of the debate: {history}
 Last bear argument: {current_response}
 Reflections from similar situations and lessons learned: {past_memory_str}
 Use this information to deliver a compelling bull argument, refute the bear's concerns, and engage in a dynamic debate that demonstrates the strengths of the bull position. You must also address reflections and learn from lessons and mistakes you made in the past.
+{language_instruction}
 """
 
         response = llm.invoke(prompt)

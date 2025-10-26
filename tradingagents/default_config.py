@@ -20,6 +20,8 @@ DEFAULT_CONFIG = {
     "max_debate_rounds": 1,
     "max_risk_discuss_rounds": 1,
     "max_recur_limit": 100,
+    # Report language settings
+    "report_language": "english",  # Options: english, chinese
     # Data vendor configuration
     # Category-level configuration (default for all tools in category)
     "data_vendors": {

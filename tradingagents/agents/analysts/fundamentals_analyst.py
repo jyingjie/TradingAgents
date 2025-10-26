@@ -5,7 +5,7 @@ from tradingagents.agents.utils.agent_utils import get_fundamentals, get_balance
 from tradingagents.dataflows.config import get_config
 
 
-def create_fundamentals_analyst(llm):
+def create_fundamentals_analyst(llm, config=None):
     def fundamentals_analyst_node(state):
         current_date = state["trade_date"]
         ticker = state["company_of_interest"]
@@ -17,11 +17,32 @@ def create_fundamentals_analyst(llm):
             get_cashflow,
             get_income_statement,
         ]
+        
+        # Get report language configuration
+        report_language = config.get("report_language", "english") if config else "english"
+        
+        # Add language instruction based on configuration
+        language_instruction = ""
+        if report_language == "chinese":
+            language_instruction = """
+
+IMPORTANT: When you generate your FINAL REPORT (not during tool calls or reasoning), write the entire report in Chinese (中文). 
+- Keep all technical analysis and reasoning in English during your thinking process
+- Only the final markdown report should be in Chinese
+- Maintain all markdown formatting, tables, and structure
+- Keep technical terms accurate
+"""
+        else:
+            language_instruction = """
+
+IMPORTANT: Generate your final report in English.
+"""
 
         system_message = (
             "You are a researcher tasked with analyzing fundamental information over the past week about a company. Please write a comprehensive report of the company's fundamental information such as financial documents, company profile, basic company financials, and company financial history to gain a full view of the company's fundamental information to inform traders. Make sure to include as much detail as possible. Do not simply state the trends are mixed, provide detailed and finegrained analysis and insights that may help traders make decisions."
             + " Make sure to append a Markdown table at the end of the report to organize key points in the report, organized and easy to read."
-            + " Use the available tools: `get_fundamentals` for comprehensive company analysis, `get_balance_sheet`, `get_cashflow`, and `get_income_statement` for specific financial statements.",
+            + " Use the available tools: `get_fundamentals` for comprehensive company analysis, `get_balance_sheet`, `get_cashflow`, and `get_income_statement` for specific financial statements."
+            + language_instruction,
         )
 
         prompt = ChatPromptTemplate.from_messages(

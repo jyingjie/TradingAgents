@@ -492,6 +492,14 @@ def get_user_selections():
         selected_shallow_thinker = select_shallow_thinking_agent(selected_llm_provider)
         selected_deep_thinker = select_deep_thinking_agent(selected_llm_provider)
 
+    # Step 7: Report language
+    console.print(
+        create_question_box(
+            "Step 7: Report Language", "Select the language for final reports"
+        )
+    )
+    selected_report_language = select_report_language()
+
     return {
         "ticker": selected_ticker,
         "analysis_date": analysis_date,
@@ -501,6 +509,7 @@ def get_user_selections():
         "backend_url": backend_url,
         "shallow_thinker": selected_shallow_thinker,
         "deep_thinker": selected_deep_thinker,
+        "report_language": selected_report_language.value,
     }
 
 
@@ -755,6 +764,7 @@ def run_analysis():
     config["deep_think_llm"] = selections["deep_thinker"]
     config["backend_url"] = selections["backend_url"]
     config["llm_provider"] = selections["llm_provider"].lower()
+    config["report_language"] = selections["report_language"]
 
     # Initialize the graph
     graph = TradingAgentsGraph(

@@ -2,7 +2,7 @@ import time
 import json
 
 
-def create_risk_manager(llm, memory):
+def create_risk_manager(llm, memory, config=None):
     def risk_manager_node(state) -> dict:
 
         company_name = state["company_of_interest"]
@@ -21,6 +21,16 @@ def create_risk_manager(llm, memory):
         past_memory_str = ""
         for i, rec in enumerate(past_memories, 1):
             past_memory_str += rec["recommendation"] + "\n\n"
+        
+        # Get report language configuration
+        report_language = config.get("report_language", "english") if config else "english"
+        
+        # Add language instruction
+        language_instruction = ""
+        if report_language == "chinese":
+            language_instruction = "\n\nIMPORTANT: Write your final decision and recommendation in Chinese (中文). Keep technical terms accurate."
+        else:
+            language_instruction = "\n\nIMPORTANT: Write your final decision and recommendation in English."
 
         prompt = f"""As the Risk Management Judge and Debate Facilitator, your goal is to evaluate the debate between three risk analysts—Risky, Neutral, and Safe/Conservative—and determine the best course of action for the trader. Your decision must result in a clear recommendation: Buy, Sell, or Hold. Choose Hold only if strongly justified by specific arguments, not as a fallback when all sides seem valid. Strive for clarity and decisiveness.
 
@@ -41,7 +51,8 @@ Deliverables:
 
 ---
 
-Focus on actionable insights and continuous improvement. Build on past lessons, critically evaluate all perspectives, and ensure each decision advances better outcomes."""
+Focus on actionable insights and continuous improvement. Build on past lessons, critically evaluate all perspectives, and ensure each decision advances better outcomes.
+{language_instruction}"""
 
         response = llm.invoke(prompt)
 
